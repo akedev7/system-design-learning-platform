@@ -1,0 +1,49 @@
+# Docker Sandbox for AI Agent
+# Provides isolated environment with language runtimes
+
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    ca-certificates \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g pnpm
+
+# Install Python 3.11
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-venv \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python3
+
+# Install Go 1.21
+RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
+    && rm go1.21.6.linux-amd64.tar.gz
+ENV PATH=$PATH:/usr/local/go/bin
+
+# Install go-task
+RUN curl -sL https://taskfile.dev/install.sh | sh -s -- -b /usr/local/bin
+
+# Create working directory
+WORKDIR /workspace
+
+# Copy sandbox setup script
+COPY scripts/setup-sandbox.sh /usr/local/bin/setup-sandbox.sh
+RUN chmod +x /usr/local/bin/setup-sandbox.sh
+
+# Default command
+CMD ["/bin/bash"]
