@@ -11,3 +11,10 @@ on:
         description: 'Issue number'
         required: true
         type: string
+
+jobs:
+  run-sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test step
+        run: echo "test"
