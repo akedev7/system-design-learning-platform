@@ -39,6 +39,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         with:
           model: opencode/hy3-preview-free
+          use_github_token: true
           prompt: |
             Issue #${{ inputs.issue_number }}
 
