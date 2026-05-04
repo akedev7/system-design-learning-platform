@@ -28,12 +28,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install opencode
-        run: curl -fsSL https://opencode.ai/install | bash
-
-      - name: Add opencode to PATH
-        run: echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-
       - name: Create feature branch
         id: create-branch
         run: |
@@ -41,13 +35,17 @@ jobs:
           git checkout -b $BRANCH_NAME
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-      - name: Run OpenCode Agent
-        timeout-minutes: 10
+      - name: Run OpenCode
+        uses: anomalyco/opencode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          opencode --model opencode/hy3-preview-free --prompt "Implement the feature for issue #${{ inputs.issue_number }}. Please follow the TDD workflow and complete this task." || true
+        with:
+          model: opencode/hy3-preview-free
+          prompt: |
+            Issue #${{ inputs.issue_number }}
+
+            Please work on the task in services/${{ inputs.subfolder }} following TDD principles.
+            Read the issue for full requirements.
 
       - name: Commit and push changes
         if: success()
