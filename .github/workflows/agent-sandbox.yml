@@ -28,6 +28,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure git identity
+        run: |
+          git config user.name "opencode[bot]"
+          git config user.email "opencode[bot]@users.noreply.github.com"
+
       - name: Create feature branch
         id: create-branch
         run: |
