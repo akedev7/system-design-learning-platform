@@ -1,0 +1,63 @@
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Node.js / TypeScript
+node_modules/
+dist/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+ENV/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+go-service  # Binary name from Makefile
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+out/
+
+# Docker
+.dockerignore
+
+# Sandbox artifacts
+thought_process.log
+test_results.json
+recon_output.txt
+
+# GitHub
+.github/
+
+# Temporary files
+*.tmp
+*.temp
+*~

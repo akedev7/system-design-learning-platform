@@ -1,0 +1,52 @@
+version: '3'
+
+vars:
+  SERVICE_NAME: typescript-service
+  SRC_DIR: src
+  TEST_DIR: tests
+  DIST_DIR: dist
+
+tasks:
+  setup:
+    desc: Install dependencies
+    cmds:
+      - pnpm install
+
+  test:
+    desc: Run tests
+    cmds:
+      - pnpm test
+
+  test:watch:
+    desc: Run tests in watch mode
+    cmds:
+      - pnpm run test:watch
+
+  lint:
+    desc: Run linter
+    cmds:
+      - pnpm run lint
+
+  build:
+    desc: Compile TypeScript
+    cmds:
+      - pnpm run build
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - pnpm run clean
+      - rm -rf node_modules coverage
+
+  recon:
+    desc: Generate file tree
+    cmds:
+      - find . -type f -not -path './node_modules/*' -not -path './dist/*' -not -path './.git/*' | sort
+
+  all:
+    desc: Run setup, build, lint, and test
+    cmds:
+      - task: setup
+      - task: build
+      - task: lint
+      - task: test
