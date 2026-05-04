@@ -55,8 +55,19 @@ jobs:
 
             When complete:
             1. Commit all changes to the current branch with a meaningful message.
-            2. Create a PR from this branch to main with title "Agent: Issue #${{ inputs.issue_number }}", body "Automated PR for Issue #${{ inputs.issue_number }}", label "agent-pr", and mark as Draft initially.
-            3. Comment on issue #${{ inputs.issue_number }} to confirm completion.
+            2. Comment on issue #${{ inputs.issue_number }} to confirm completion.
+
+      - name: Create Pull Request
+        if: success()
+        run: |
+          gh pr create \
+            --title "Agent: Issue #${{ inputs.issue_number }}" \
+            --body "Automated PR for Issue #${{ inputs.issue_number }}" \
+            --head ${{ steps.create-branch.outputs.branch_name }} \
+            --label "agent-pr" \
+            --draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment on issue/PR
         if: always()
