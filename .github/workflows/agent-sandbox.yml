@@ -12,6 +12,12 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   run-sandbox:
     runs-on: ubuntu-latest
