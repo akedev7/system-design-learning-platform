@@ -18,14 +18,17 @@ jobs:
 
       - name: Determine affected subfolder
         id: determine-subfolder
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body || github.event.pull_request.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title || github.event.pull_request.title }}
         run: |
           # Extract subfolder from issue/PR body or title
-          BODY="${{ github.event.issue.body || github.event.pull_request.body }}"
-          TITLE="${{ github.event.issue.title || github.event.pull_request.title }}"
-          
+          BODY="$ISSUE_BODY"
+          TITLE="$ISSUE_TITLE"
+
           # Look for subfolder pattern in title or body
           SUBFOLDER=$(echo "$BODY$TITLE" | grep -oP 'services/\K[^/\s]+' | head -1)
-          
+
           if [ -z "$SUBFOLDER" ]; then
             echo "No subfolder specified, defaulting to all services"
             echo "subfolder=all" >> $GITHUB_OUTPUT
