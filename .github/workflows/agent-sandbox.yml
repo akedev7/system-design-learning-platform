@@ -46,16 +46,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: opencode/hy3-preview-free
-          use_github_token: true
           prompt: |
             Issue #${{ inputs.issue_number }}
 
             Please work on the task in services/${{ inputs.subfolder }} following TDD principles.
             Read the issue for full requirements.
 
-            When complete:
-            1. Commit all changes to the current branch with a meaningful message.
-            2. Comment on issue #${{ inputs.issue_number }} to confirm completion.
+            When complete, commit all changes to the current branch with a meaningful message.
 
       - name: Create Pull Request
         if: success()
