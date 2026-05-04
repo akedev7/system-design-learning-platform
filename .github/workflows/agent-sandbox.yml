@@ -12,6 +12,11 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   run-sandbox:
     runs-on: ubuntu-latest
@@ -46,14 +51,14 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Run Docker Sandbox with Agent
+        working-directory: ${{ github.workspace }}
         run: |
           # Determine agent (default to opencode as per specification)
           AGENT="opencode"
           
-          # Run sbx in branch mode with workspace set to current directory
+          # Run sbx in branch mode
           sbx run $AGENT \
             --branch ${{ steps.create-branch.outputs.branch_name }} \
-            --workspace . \
             --name "agent-issue-${{ inputs.issue_number }}"
           
           # Note: sbx run blocks until the agent completes its work
