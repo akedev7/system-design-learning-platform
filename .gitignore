@@ -54,8 +54,8 @@ thought_process.log
 test_results.json
 recon_output.txt
 
-# GitHub
-.github/
+# GitHub (workflows are needed for CI/CD)
+# .github/
 
 # Temporary files
 *.tmp

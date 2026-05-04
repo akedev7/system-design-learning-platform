@@ -1,0 +1,63 @@
+name: Agent Trigger
+
+on:
+  issues:
+    types: [labeled]
+  pull_request:
+    types: [labeled]
+
+jobs:
+  check-label:
+    if: contains(github.event.label.name, 'agent-take')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine affected subfolder
+        id: determine-subfolder
+        run: |
+          # Extract subfolder from issue/PR body or title
+          BODY="${{ github.event.issue.body || github.event.pull_request.body }}"
+          TITLE="${{ github.event.issue.title || github.event.pull_request.title }}"
+          
+          # Look for subfolder pattern in title or body
+          SUBFOLDER=$(echo "$BODY$TITLE" | grep -oP 'services/\K[^/\s]+' | head -1)
+          
+          if [ -z "$SUBFOLDER" ]; then
+            echo "No subfolder specified, defaulting to all services"
+            echo "subfolder=all" >> $GITHUB_OUTPUT
+          else
+            echo "Detected subfolder: $SUBFOLDER"
+            echo "subfolder=$SUBFOLDER" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger sandbox workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const subfolder = '${{ steps.determine-subfolder.outputs.subfolder }}';
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'agent-sandbox.yml',
+              ref: context.ref,
+              inputs: {
+                subfolder: subfolder,
+                issue_number: '${{ github.event.issue.number || github.event.pull_request.number }}'
+              }
+            });
+
+      - name: Comment on issue/PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ github.event.issue.number || github.event.pull_request.number }};
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: '🤖 AI Agent triggered! The sandbox workflow has been initiated. I will start working on this task shortly.'
+            });
