@@ -33,6 +33,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-sbx
 
+      - name: Docker Hub Login
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          else
+            echo "Warning: DOCKERHUB_USERNAME or DOCKERHUB_TOKEN not set"
+            echo "Please add these secrets to the repository settings"
+            exit 1
+          fi
+
       - name: Configure sbx secrets
         run: |
           # Set up secrets for agent authentication
