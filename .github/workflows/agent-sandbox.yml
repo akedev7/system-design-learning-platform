@@ -42,11 +42,12 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Run OpenCode Agent
+        timeout-minutes: 10
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          opencode --model anthropic/claude-sonnet-4-20250514 --prompt "Implement the feature for issue #${{ inputs.issue_number }}. Please follow the TDD workflow and complete this task." || true
+          opencode --model opencode/hy3-preview-free --prompt "Implement the feature for issue #${{ inputs.issue_number }}. Please follow the TDD workflow and complete this task." || true
 
       - name: Commit and push changes
         if: success()
