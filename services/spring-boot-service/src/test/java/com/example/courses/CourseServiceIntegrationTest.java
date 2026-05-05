@@ -44,9 +44,8 @@ class CourseServiceIntegrationTest {
     }
 
     @Test
-    void getCourses_returnsEmptyArray() {
+    void getCourses_withoutAuth_returns401() {
         ResponseEntity<String> response = restTemplate.getForEntity("/api/v1/courses", String.class);
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getBody()).isEqualTo("[]");
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 }
