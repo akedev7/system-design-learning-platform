@@ -1,7 +1,7 @@
 # Polyglot Monorepo - Service Map
 
 ## Overview
-This is a polyglot monorepo containing multiple microservices implemented in different languages (TypeScript, Python, Go). Each service resides in its own subfolder under `services/` and follows a strict TDD (Test-Driven Development) workflow with Docker AI Sandbox integration.
+This is a monorepo containing multiple microservices. Each service resides in its own subfolder under `services/` and follows a strict TDD (Test-Driven Development) workflow with Docker AI Sandbox integration.
 
 ## Repository Structure
 
@@ -11,45 +11,13 @@ docker-sandbox-test/
 ├── .github/
 │   └── workflows/               # CI/CD and agent workflows
 ├── services/
-│   ├── typescript-service/      # TypeScript/Node.js service
-│   ├── python-service/          # Python service
-│   └── go-service/              # Go service
+│   └── spring-boot-service/     # Spring Boot service
 └── scripts/
     ├── recon.sh                 # File tree generation
     └── setup-sandbox.sh         # Sandbox setup helper
 ```
 
-## Services
 
-### TypeScript Service (`services/typescript-service/`)
-- **Language**: TypeScript / Node.js
-- **Runtime**: Node.js 20+
-- **Package Manager**: pnpm
-- **Testing**: Jest
-- **Build Tool**: TypeScript compiler
-- **Task Runner**: Taskfile.yaml (using go-task)
-- **Description**: Example utility service with string manipulation and math operations
-- **Port**: N/A (library service)
-- **Dependencies**: None (pure implementation)
-
-### Python Service (`services/python-service/`)
-- **Language**: Python 3.11+
-- **Package Manager**: pip
-- **Testing**: pytest
-- **Build Tool**: setuptools
-- **Task Runner**: Makefile
-- **Description**: Example data processing service with validation utilities
-- **Port**: N/A (library service)
-- **Dependencies**: None (pure implementation)
-
-### Go Service (`services/go-service/`)
-- **Language**: Go 1.21+
-- **Testing**: Go built-in testing
-- **Build Tool**: go build
-- **Task Runner**: Makefile
-- **Description**: Example CLI utility service with file operations
-- **Port**: N/A (CLI tool)
-- **Dependencies**: None (standard library)
 
 ## Agent Workflow
 

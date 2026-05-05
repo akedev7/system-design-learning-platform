@@ -24,7 +24,7 @@ docker run --rm \
              echo 'Go version:' && go version && \
              echo '' && \
              echo '=== Running setup-sandbox.sh ===' && \
-             setup-sandbox.sh /workspace/services/python-service"
+             setup-sandbox.sh /workspace/services/spring-boot-service"
 
 echo ""
 echo "=== Phase 2: Agent Work (Read-Only, No Network) ==="
@@ -46,7 +46,7 @@ docker run --rm \
     --tmpfs /run \
     --network none \
     -v "$SCRIPT_DIR":/workspace:ro \
-    -v "$SCRIPT_DIR/services/python-service":/workspace/services/python-service:rw \
+    -v "$SCRIPT_DIR/services/spring-boot-service":/workspace/services/spring-boot-service:rw \
     "$IMAGE_NAME" \
     bash -c "echo '=== Agent Sandbox ===' && \
              echo 'Node version:' && node --version && \

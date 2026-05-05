@@ -1,5 +1,5 @@
 # Docker Sandbox for AI Agent
-# Provides isolated environment with language runtimes
+# Provides isolated environment with Java/Maven for Spring Boot services
 
 FROM ubuntu:22.04
 
@@ -16,26 +16,22 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g pnpm
-
-# Install Python 3.11
+# Install Java 17 JDK
 RUN apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-venv \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -sf /usr/bin/python3.11 /usr/bin/python3
+    openjdk-17-jdk \
+    && rm -rf /var/lib/apt/lists/*
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Install Go 1.21
-RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
-    && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
-    && rm go1.21.6.linux-amd64.tar.gz
-ENV PATH=$PATH:/usr/local/go/bin
+# Install Maven
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz \
+    && tar -C /opt -xzf apache-maven-3.9.6-bin.tar.gz \
+    && rm apache-maven-3.9.6-bin.tar.gz \
+    && ln -s /opt/apache-maven-3.9.6 /opt/maven
+ENV MAVEN_HOME=/opt/maven
+ENV PATH=$MAVEN_HOME/bin:$PATH
 
-# Install go-task
+# Install go-task (for task runner support)
 RUN curl -sL https://taskfile.dev/install.sh | sh -s -- -b /usr/local/bin
 
 # Create working directory

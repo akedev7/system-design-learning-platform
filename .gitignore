@@ -35,7 +35,7 @@ htmlcov/
 *.dll
 *.so
 *.dylib
-go-service  # Binary name from Makefile
+
 vendor/
 
 # OS files

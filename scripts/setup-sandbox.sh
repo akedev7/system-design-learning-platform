@@ -12,7 +12,10 @@ cd "$TARGET_DIR" || exit 1
 
 # Function to detect language and run setup
 detect_and_setup() {
-  if [ -f "package.json" ]; then
+  if [ -f "pom.xml" ]; then
+    echo "Detected: Java/Maven project"
+    setup_maven
+  elif [ -f "package.json" ]; then
     echo "Detected: Node.js/TypeScript project"
     setup_node
   elif [ -f "requirements.txt" ]; then
@@ -90,6 +93,21 @@ setup_go() {
   go mod download
   
   echo "Go environment setup complete"
+}
+
+setup_maven() {
+  echo "Setting up Java/Maven environment..."
+  
+  # Check Java version
+  if [ -n "$JAVA_HOME" ]; then
+    echo "Java home: $JAVA_HOME"
+    java -version
+  fi
+  
+  # Download Maven dependencies
+  mvn dependency:resolve -q
+  
+  echo "Maven environment setup complete"
 }
 
 setup_makefile() {
