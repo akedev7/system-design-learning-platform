@@ -29,6 +29,8 @@ RUN npm install -g opencode-ai@latest
 
 USER agent
 
+RUN chmod 777 /home/agent
+
 WORKDIR /home/agent
 
 # In worktree sandbox mode, Sandcastle bind-mounts the git worktree at ${SANDBOX_REPO_DIR}

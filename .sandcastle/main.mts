@@ -23,6 +23,26 @@
 
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
+import { readFileSync } from "node:fs";
+
+function loadEnv(envPath: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  const content = readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) {
+      const idx = trimmed.indexOf("=");
+      if (idx > 0) {
+        const key = trimmed.slice(0, idx).trim();
+        const value = trimmed.slice(idx + 1).trim();
+        env[key] = value;
+      }
+    }
+  }
+  return env;
+}
+
+const env = loadEnv("./.sandcastle/.env");
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -61,19 +81,25 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // -------------------------------------------------------------------------
   const plan = await sandcastle.run({
     hooks,
-    sandbox: docker(),
+    sandbox: docker({ env }),
     name: "planner",
     // One iteration is enough: the planner just needs to read and reason,
     // not write code.
-    maxIterations: 1,
+    maxIterations: 3,
     // Opus for planning: dependency analysis benefits from deeper reasoning.
-    agent: sandcastle.opencode("opencode/hy3-preview-free"),
+    agent: sandcastle.opencode("opencode/minimax-m2.5-free"),
     promptFile: "./.sandcastle/plan-prompt.md",
+    logging: { type: "file", path: "./.sandcastle/logs/planner-run.log" },
   });
 
   // Extract the <plan>…</plan> block from the agent's stdout.
+  console.log("=== Planner output ===");
+  console.log(plan.stdout);
+  console.log("=== End planner output ===\n");
   const planMatch = plan.stdout.match(/<plan>([\s\S]*?)<\/plan>/);
   if (!planMatch) {
+    console.error("No <plan> tag found in output");
+    console.error("Stdout length:", plan.stdout.length);
     throw new Error(
       "Planning agent did not produce a <plan> tag.\n\n" + plan.stdout,
     );
@@ -111,7 +137,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     issues.map(async (issue) => {
       const sandbox = await sandcastle.createSandbox({
         branch: issue.branch,
-        sandbox: docker(),
+        sandbox: docker({ env }),
         hooks,
         copyToWorktree,
       });
@@ -121,7 +147,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         const implement = await sandbox.run({
           name: "implementer",
           maxIterations: 100,
-          agent: sandcastle.opencode("opencode/hy3-preview-free"),
+          agent: sandcastle.opencode("opencode/minimax-m2.5-free"),
           promptFile: "./.sandcastle/implement-prompt.md",
           promptArgs: {
             TASK_ID: issue.id,
@@ -135,7 +161,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
           const review = await sandbox.run({
             name: "reviewer",
             maxIterations: 1,
-            agent: sandcastle.opencode("opencode/hy3-preview-free"),
+            agent: sandcastle.opencode("opencode/minimax-m2.5-free"),
             promptFile: "./.sandcastle/review-prompt.md",
             promptArgs: {
               BRANCH: issue.branch,
@@ -203,10 +229,10 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // -------------------------------------------------------------------------
   await sandcastle.run({
     hooks,
-    sandbox: docker(),
+    sandbox: docker({ env }),
     name: "merger",
     maxIterations: 1,
-    agent: sandcastle.opencode("opencode/hy3-preview-free"),
+    agent: sandcastle.opencode("opencode/minimax-m2.5-free"),
     promptFile: "./.sandcastle/merge-prompt.md",
     promptArgs: {
       // A markdown list of branch names, one per line.
