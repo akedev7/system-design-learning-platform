@@ -1,0 +1,26 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    paths:
+      - 'client/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: client/pnpm-lock.yaml
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm test:ci
