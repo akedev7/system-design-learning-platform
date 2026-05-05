@@ -3,10 +3,7 @@ name: Agent Sandbox
 on:
   workflow_dispatch:
     inputs:
-      subfolder:
-        description: 'Subfolder to work on (typescript-service, python-service, go-service, or all)'
-        required: true
-        type: string
+
       issue_number:
         description: 'Issue or PR number'
         required: true
@@ -50,7 +47,7 @@ jobs:
           prompt: |
             Issue #${{ inputs.issue_number }}
 
-            Please work on the task in services/${{ inputs.subfolder }} following TDD principles.
+            Please use the tdd skill to work on the task specified in Issue #${{ inputs.issue_number }}.
             Read the issue for full requirements.
 
             When complete:
