@@ -1,0 +1,120 @@
+# System Design Learning Platform
+
+A Next.js + Spring Boot web application for interactive system design learning, inspired by Brilliant's hands-on exercise model.
+
+## Prerequisites
+
+- Docker & Docker Compose
+- Node.js 20+ (for local development without Docker)
+- Java 17+ (for local development without Docker)
+- pnpm (for local frontend development)
+
+## Quick Start with Docker Compose
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd system-design-learning-platform
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and configure your Auth0 credentials:
+   - `AUTH0_ISSUER_URI`: Your Auth0 tenant URL (e.g., `https://your-tenant.auth0.com/`)
+   - `AUTH0_CLIENT_ID`: From your Auth0 Application settings
+   - `AUTH0_CLIENT_SECRET`: From your Auth0 Application settings
+   - `AUTH0_SECRET`: Generate with `openssl rand -hex 32`
+
+3. **Start all services**
+   ```bash
+   docker compose up
+   ```
+   This starts:
+   - **PostgreSQL** (port 5432) - Database
+   - **Spring Boot API** (port 8080) - Backend service with hot-reload
+   - **Next.js Client** (port 3000) - Frontend with hot-reload
+
+4. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8080
+   - Database: localhost:5432
+
+## Hot-Reload Development
+
+Both the frontend and backend support hot-reload during development:
+
+- **Frontend (Next.js)**: Edit files in `client/` and changes will be reflected immediately
+- **Backend (Spring Boot)**: Edit files in `services/spring-boot-service/src` - the application will restart automatically
+
+## Services
+
+### Client (Next.js)
+- Location: `client/`
+- Port: 3000
+- Hot-reload: Enabled via volume mount
+- Package manager: pnpm
+
+### Server (Spring Boot)
+- Location: `services/spring-boot-service/`
+- Port: 8080
+- Debug port: 5005
+- Hot-reload: Enabled via Spring Boot DevTools
+- Build tool: Maven
+
+### Database (PostgreSQL)
+- Port: 5432
+- Database: courses
+- Credentials: postgres/postgres (configurable via environment variables)
+
+## Environment Variables
+
+See `.env.example` for all available configuration options.
+
+## Auth0 Setup
+
+1. Create an Auth0 account at https://auth0.com/
+2. Create a new Application (Single Page Application or Regular Web Application)
+3. Configure the following URLs in Auth0:
+   - Allowed Callback URLs: `http://localhost:3000/api/auth/callback`
+   - Allowed Logout URLs: `http://localhost:3000`
+   - Allowed Web Origins: `http://localhost:3000`
+4. Copy the Client ID and Client Secret to your `.env` file
+
+## Without Docker (Local Development)
+
+### Frontend
+```bash
+cd client
+pnpm install
+pnpm dev
+```
+
+### Backend
+```bash
+cd services/spring-boot-service
+mvn spring-boot:run
+```
+
+### Database
+Install PostgreSQL locally and create a database named `courses`.
+
+## Project Structure
+
+```
+system-design-learning-platform/
+├── client/                          # Next.js frontend
+├── services/
+│   ├── spring-boot-service/         # Java backend API
+│   ├── typescript-service/          # TypeScript utilities
+│   ├── go-service/                  # Go CLI tool
+│   └── python-service/             # Python utilities
+├── docs/adr/                        # Architecture Decision Records
+├── docker-compose.yml               # Local development setup
+└── README.md
+```
+
+## License
+
+[Add your license here]

@@ -1,0 +1,70 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sdlp-postgres
+    environment:
+      POSTGRES_DB: courses
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot API Server
+  server:
+    build:
+      context: ./services/spring-boot-service
+      dockerfile: Dockerfile.dev
+    container_name: sdlp-server
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Debug port
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/courses
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${AUTH0_ISSUER_URI:-https://dev-placeholder.auth0.com/}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: ${AUTH0_AUDIENCE:-https://localhost:8080}
+      LOGGING_LEVEL_ROOT: INFO
+    volumes:
+      - ./services/spring-boot-service/src:/app/src
+      - ./services/spring-boot-service/target:/app/target
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Next.js Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: sdlp-client
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+      AUTH0_SECRET: ${AUTH0_SECRET:-development-secret-change-me}
+      AUTH0_BASE_URL: ${AUTH0_BASE_URL:-http://localhost:3000}
+      AUTH0_ISSUER_BASE_URL: ${AUTH0_ISSUER_URI:-https://dev-placeholder.auth0.com/}
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID:-dev-client-id}
+      AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET:-dev-client-secret}
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
