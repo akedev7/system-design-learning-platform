@@ -30,6 +30,7 @@ Review the code changes on branch `{{BRANCH}}` and improve code clarity, consist
    - Are new/changed behaviours covered by tests?
    - Are there unsafe casts, `any` types, or unchecked assumptions?
    - Does the change introduce injection vulnerabilities, credential leaks, or other security issues?
+   - For Java/Spring Boot code: Are Spring best practices followed? Are JPA entities properly mapped? Are unchecked exceptions handled?
 
 4. **Maintain balance**: Avoid over-simplification that could:
    - Reduce code clarity or maintainability

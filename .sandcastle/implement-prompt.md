@@ -35,7 +35,13 @@ If applicable, use RGR to complete the task.
 
 # FEEDBACK LOOPS
 
-Before committing, run `npm run typecheck` and `npm run test` to ensure the tests pass.
+Detect the project type and run appropriate pre-commit checks:
+
+- If `package.json` exists (TypeScript/Node): Run `npm run typecheck` and `npm run test`
+- If `pom.xml` exists (Java/Spring Boot): Run `mvn test` (or `make test` if a Makefile is present)
+- For monorepos with multiple services: Run checks for all relevant project types
+
+Ensure all checks pass before committing.
 
 # COMMIT
 

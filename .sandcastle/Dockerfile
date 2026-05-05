@@ -5,7 +5,11 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   jq \
+  openjdk-17-jdk \
+  maven \
   && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 # Install GitHub CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
