@@ -54,6 +54,9 @@ thought_process.log
 test_results.json
 recon_output.txt
 
+# Sandcastle worktrees
+.sandcastle/
+
 # GitHub (workflows are needed for CI/CD)
 # .github/
 
