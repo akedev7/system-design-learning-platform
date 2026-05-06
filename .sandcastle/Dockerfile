@@ -5,11 +5,7 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   jq \
-  golang-go \
   && rm -rf /var/lib/apt/lists/*
-
-ENV GOPATH=/home/agent/go
-ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install GitHub CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -27,9 +23,10 @@ RUN usermod -d /home/agent -m -l agent node
 # Install OpenCode CLI (run as root before USER agent)
 RUN npm install -g opencode-ai@latest
 
-USER agent
+USER root
+RUN chmod -R a+rwX /home/agent
 
-RUN chmod 777 /home/agent
+USER agent
 
 WORKDIR /home/agent
 

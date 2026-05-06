@@ -1,8 +1,10 @@
 {
-"scripts": {
-    "sandcastle": "npx tsx .sandcastle/main.mts"
+  "scripts": {
+    "sandcastle": "npx tsx .sandcastle/main.mts",
+    "sandcastle:build": "npx sandcastle docker build-image"
   },
   "devDependencies": {
-    "@ai-hero/sandcastle": "^0.5.7"
+    "@ai-hero/sandcastle": "file:/Users/aketangsomboon/Documents/Repos/sandcastle",
+    "tsx": "^4.21.0"
   }
 }
