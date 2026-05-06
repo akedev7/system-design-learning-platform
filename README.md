@@ -1,12 +1,12 @@
 # System Design Learning Platform
 
-A Next.js + Spring Boot web application for interactive system design learning, inspired by Brilliant's hands-on exercise model.
+A Next.js + Go web application for interactive system design learning, inspired by Brilliant's hands-on exercise model.
 
 ## Prerequisites
 
 - Docker & Docker Compose
 - Node.js 20+ (for local development without Docker)
-- Java 17+ (for local development without Docker)
+- Go 1.22+ (for local development without Docker)
 - pnpm (for local frontend development)
 
 ## Quick Start with Docker Compose
@@ -28,13 +28,13 @@ A Next.js + Spring Boot web application for interactive system design learning, 
    - `AUTH0_SECRET`: Generate with `openssl rand -hex 32`
 
 3. **Start all services**
-   ```bash
-   docker compose up
-   ```
-   This starts:
-   - **PostgreSQL** (port 5432) - Database
-   - **Spring Boot API** (port 8080) - Backend service with hot-reload
-   - **Next.js Client** (port 3000) - Frontend with hot-reload
+    ```bash
+    docker compose up
+    ```
+    This starts:
+    - **PostgreSQL** (port 5432) - Database
+    - **Go API** (port 8080) - Backend service
+    - **Next.js Client** (port 3000) - Frontend with hot-reload
 
 4. **Access the application**
    - Frontend: http://localhost:3000
@@ -46,7 +46,7 @@ A Next.js + Spring Boot web application for interactive system design learning, 
 Both the frontend and backend support hot-reload during development:
 
 - **Frontend (Next.js)**: Edit files in `client/` and changes will be reflected immediately
-- **Backend (Spring Boot)**: Edit files in `services/spring-boot-service/src` - the application will restart automatically
+- **Backend (Go)**: Use `air` for hot-reload, or run `cd services/go-course-service && go run ./cmd/server`
 
 ## Services
 
@@ -56,12 +56,11 @@ Both the frontend and backend support hot-reload during development:
 - Hot-reload: Enabled via volume mount
 - Package manager: pnpm
 
-### Server (Spring Boot)
-- Location: `services/spring-boot-service/`
+### Server (Go)
+- Location: `services/go-course-service/`
 - Port: 8080
-- Debug port: 5005
-- Hot-reload: Enabled via Spring Boot DevTools
-- Build tool: Maven
+- Hot-reload: Use `air` or `fresh` for development
+- Build tool: Go modules (Makefile)
 
 ### Database (PostgreSQL)
 - Port: 5432
@@ -93,8 +92,8 @@ pnpm dev
 
 ### Backend
 ```bash
-cd services/spring-boot-service
-mvn spring-boot:run
+cd services/go-course-service
+make run
 ```
 
 ### Database
@@ -106,10 +105,7 @@ Install PostgreSQL locally and create a database named `courses`.
 system-design-learning-platform/
 ├── client/                          # Next.js frontend
 ├── services/
-│   ├── spring-boot-service/         # Java backend API
-│   ├── typescript-service/          # TypeScript utilities
-│   ├── go-service/                  # Go CLI tool
-│   └── python-service/             # Python utilities
+│   └── go-course-service/          # Go (Echo + sqlx) backend API
 ├── docs/adr/                        # Architecture Decision Records
 ├── docker-compose.yml               # Local development setup
 └── README.md

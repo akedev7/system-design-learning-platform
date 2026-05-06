@@ -17,27 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
-  # Spring Boot API Server
+  # Go API Server
   server:
     build:
-      context: ./services/spring-boot-service
-      dockerfile: Dockerfile.dev
+      context: ./services/go-course-service
+      dockerfile: Dockerfile
     container_name: sdlp-server
     ports:
       - "8080:8080"
-      - "5005:5005" # Debug port
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/courses
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_FLYWAY_ENABLED: "true"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${AUTH0_ISSUER_URI:-https://dev-placeholder.auth0.com/}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: ${AUTH0_AUDIENCE:-https://localhost:8080}
-      LOGGING_LEVEL_ROOT: INFO
-    volumes:
-      - ./services/spring-boot-service/src:/app/src
-      - ./services/spring-boot-service/target:/app/target
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: courses
+      DB_SSLMODE: disable
+      AUTH_JWKS_URL: ${AUTH0_JWKS_URL:-https://dev-placeholder.auth0.com/.well-known/jwks.json}
+      AUTH_AUDIENCE: ${AUTH0_AUDIENCE:-https://localhost:8080}
+      AUTH_ISSUER: ${AUTH0_ISSUER_URI:-https://dev-placeholder.auth0.com/}
     depends_on:
       postgres:
         condition: service_healthy
