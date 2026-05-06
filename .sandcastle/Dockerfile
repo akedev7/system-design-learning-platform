@@ -5,11 +5,11 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   jq \
-  openjdk-17-jdk \
-  maven \
+  golang-go \
   && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV GOPATH=/home/agent/go
+ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install GitHub CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
