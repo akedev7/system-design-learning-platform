@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          model: opencode/hy3-preview-free
+          model: openrouter/moonshotai/kimi-k2.6
           use_github_token: true
           prompt: |
             Issue #${{ inputs.issue_number }}
