@@ -14,12 +14,6 @@ interface Lesson {
   contentJsonb: ContentBlock[];
 }
 
-interface Module {
-  id: number;
-  courseId: number;
-  title: string;
-}
-
 const fetchLesson = async (lessonId: string): Promise<Lesson> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/lessons/${lessonId}`);
   return response.data;
