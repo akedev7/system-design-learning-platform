@@ -25,11 +25,6 @@ const fetchLesson = async (lessonId: string): Promise<Lesson> => {
   return response.data;
 };
 
-const fetchModule = async (moduleId: string): Promise<Module> => {
-  const response = await axios.get(`${API_BASE_URL}/api/v1/modules/${moduleId}`);
-  return response.data;
-};
-
 import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig } from "@/lib/content-types";
 import { TextBlock } from "@/components/content/TextBlock";
 import { ImageBlock } from "@/components/content/ImageBlock";
