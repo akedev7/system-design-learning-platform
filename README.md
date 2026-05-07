@@ -66,6 +66,7 @@ Both the frontend and backend support hot-reload during development:
 - Port: 5432
 - Database: courses
 - Credentials: postgres/postgres (configurable via environment variables)
+- Migrations: golang-migrate (see `services/go-course-service/migrations/`)
 
 ## Environment Variables
 
