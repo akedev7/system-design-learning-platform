@@ -38,7 +38,6 @@ func main() {
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
 
-	// Health endpoint (public)
 	e.GET("/actuator/health", func(c echo.Context) error {
 		if err := db.Ping(); err != nil {
 			return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "DOWN"})
@@ -46,7 +45,6 @@ func main() {
 		return c.JSON(http.StatusOK, map[string]string{"status": "UP"})
 	})
 
-	// Info endpoint (public)
 	e.GET("/actuator/info", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"service": "course-service",
@@ -54,32 +52,41 @@ func main() {
 		})
 	})
 
-	// API routes with auth middleware
 	api := e.Group("/api/v1")
 	api.Use(appMiddleware.AuthMiddleware(&cfg.Auth))
 
-	// Course handlers (stubs)
-	courseHandler := handler.NewCourseHandler()
+	courseRepo := repository.NewCourseRepository(db)
+	courseHandler := handler.NewCourseHandler(courseRepo)
 	api.GET("/courses", courseHandler.GetCourses)
 	api.GET("/courses/:id", courseHandler.GetCourseByID)
 
-	// Module handlers
+	admin := api.Group("")
+	admin.Use(appMiddleware.AdminMiddleware(db))
+	admin.POST("/courses", courseHandler.CreateCourse)
+	admin.PUT("/courses/:id", courseHandler.UpdateCourse)
+	admin.DELETE("/courses/:id", courseHandler.DeleteCourse)
+
 	moduleRepo := repository.NewModuleRepository(db)
 	moduleHandler := handler.NewModuleHandler(moduleRepo)
 	api.GET("/courses/:courseId/modules", moduleHandler.GetModulesByCourseID)
 	api.GET("/modules/:id", moduleHandler.GetModuleByID)
 
-	// Lesson handlers
+	admin.POST("/modules", moduleHandler.CreateModule)
+	admin.PUT("/modules/:id", moduleHandler.UpdateModule)
+	admin.DELETE("/modules/:id", moduleHandler.DeleteModule)
+
 	lessonRepo := repository.NewLessonRepository(db)
 	lessonHandler := handler.NewLessonHandler(lessonRepo)
 	api.GET("/modules/:moduleId/lessons", lessonHandler.GetLessonsByModuleID)
 	api.GET("/lessons/:id", lessonHandler.GetLessonByID)
 
-	// Quiz handlers
+	admin.POST("/lessons", lessonHandler.CreateLesson)
+	admin.PUT("/lessons/:id", lessonHandler.UpdateLesson)
+	admin.DELETE("/lessons/:id", lessonHandler.DeleteLesson)
+
 	progressRepo := repository.NewProgressRepository(db)
 	quizHandler := handler.NewQuizHandler(lessonRepo, progressRepo)
 	api.POST("/lessons/:id/submit-quiz", quizHandler.SubmitQuiz)
 
-	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }

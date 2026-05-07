@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"crypto/rsa"
+	"database/sql"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"go-course-service/internal/config"
 )
@@ -194,7 +196,41 @@ func AuthMiddleware(cfg *config.AuthConfig) echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid issuer"})
 			}
 
+			auth0ID, ok := claims["sub"].(string)
+			if !ok {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid subject claim"})
+			}
+
+			c.Set("auth0_id", auth0ID)
 			c.Set("user", token)
+			return next(c)
+		}
+	}
+}
+
+func AdminMiddleware(db *sqlx.DB) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			auth0ID := c.Get("auth0_id")
+			if auth0ID == nil {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
+			}
+
+			var user struct {
+				Role string `db:"role"`
+			}
+			err := db.Get(&user, "SELECT role FROM users WHERE auth0_id = $1", auth0ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					return c.JSON(http.StatusForbidden, map[string]string{"error": "user not found"})
+				}
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to check role"})
+			}
+
+			if user.Role != "Admin" {
+				return c.JSON(http.StatusForbidden, map[string]string{"error": "admin access required"})
+			}
+
 			return next(c)
 		}
 	}

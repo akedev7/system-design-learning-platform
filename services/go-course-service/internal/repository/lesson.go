@@ -36,3 +36,42 @@ func (r *LessonRepository) GetByModuleID(moduleID int) ([]models.Lesson, error) 
 	}
 	return lessons, nil
 }
+
+func (r *LessonRepository) Create(lesson *models.Lesson) (*models.Lesson, error) {
+	var newLesson models.Lesson
+	err := r.db.Get(&newLesson,
+		`INSERT INTO lessons (module_id, title, description, content_jsonb, order_index)
+		 VALUES ($1, $2, $3, $4, $5) RETURNING id, module_id, title, description, content_jsonb, order_index, created_at, updated_at`,
+		lesson.ModuleID, lesson.Title, lesson.Description, lesson.ContentJSON, lesson.OrderIndex)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create lesson: %w", err)
+	}
+	return &newLesson, nil
+}
+
+func (r *LessonRepository) Update(lesson *models.Lesson) (*models.Lesson, error) {
+	var updatedLesson models.Lesson
+	err := r.db.Get(&updatedLesson,
+		`UPDATE lessons SET title = $1, description = $2, content_jsonb = $3, order_index = $4, updated_at = CURRENT_TIMESTAMP
+		 WHERE id = $5 RETURNING id, module_id, title, description, content_jsonb, order_index, created_at, updated_at`,
+		lesson.Title, lesson.Description, lesson.ContentJSON, lesson.OrderIndex, lesson.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to update lesson: %w", err)
+	}
+	return &updatedLesson, nil
+}
+
+func (r *LessonRepository) Delete(id int) error {
+	result, err := r.db.Exec("DELETE FROM lessons WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("failed to delete lesson: %w", err)
+	}
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
