@@ -18,10 +18,23 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 # Rename the base image's "node" user (UID 1000) to "agent".
 # This keeps UID 1000 so that --userns=keep-id (Podman) and
 # --user 1000:1000 (Docker) map to the correct home directory owner.
+# The primary group remains "node" (GID 1000) after rename.
 RUN usermod -d /home/agent -m -l agent node
 
 # Install OpenCode CLI (run as root before USER agent)
 RUN npm install -g opencode-ai@latest
+
+# Install Go 1.22.0 (supports both arm64 and amd64)
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
+        GOARCH="arm64"; \
+    else \
+        GOARCH="amd64"; \
+    fi && \
+    curl -sL "https://go.dev/dl/go1.22.0.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz && \
+    tar -C /usr/local -xzf /tmp/go.tar.gz && \
+    rm /tmp/go.tar.gz
+ENV PATH=/usr/local/go/bin:$PATH
 
 USER root
 RUN chmod -R a+rwX /home/agent

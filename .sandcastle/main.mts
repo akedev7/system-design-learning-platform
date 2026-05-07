@@ -44,10 +44,10 @@ await run({
       // onSandboxReady runs once after the sandbox is initialised and the repo is
       // synced in, before the agent starts. Use it to install dependencies or run
       // any other setup steps your project needs.
-      // Install Go (aarch64/arm64 for ARM Macs) and npm dependencies.
+      // Go and go mod download are now baked into the Docker image.
       onSandboxReady: [
         { command: "npm install" },
-        { command: "curl -sL https://go.dev/dl/go1.22.0.linux-arm64.tar.gz -o /tmp/go.tar.gz && rm -rf /tmp/go && tar -C /tmp -xzf /tmp/go.tar.gz && export PATH=/tmp/go/bin:$PATH && cd services/go-course-service && go mod download", timeout: 180000 },
+        { command: "cd services/go-course-service && go mod download", timeout: 180000 },
       ],
     },
   },
