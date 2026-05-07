@@ -88,5 +88,8 @@ func main() {
 	quizHandler := handler.NewQuizHandler(lessonRepo, progressRepo)
 	api.POST("/lessons/:id/submit-quiz", quizHandler.SubmitQuiz)
 
+	diagramHandler := handler.NewDiagramHandler(lessonRepo, progressRepo)
+	api.POST("/lessons/:id/validate-diagram", diagramHandler.ValidateDiagram)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }
