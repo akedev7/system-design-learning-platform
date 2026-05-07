@@ -12,8 +12,9 @@ import (
 )
 
 func TestGetLessonsByModuleID(t *testing.T) {
-	repo, cleanup := setupTestDB(t)
+	db, cleanup := setupTestDB(t)
 	defer cleanup()
+	repo := repository.NewLessonRepository(db)
 
 	e := echo.New()
 	h := handler.NewLessonHandler(repo)
@@ -30,8 +31,9 @@ func TestGetLessonsByModuleID(t *testing.T) {
 }
 
 func TestGetLessonByID(t *testing.T) {
-	repo, cleanup := setupTestDB(t)
+	db, cleanup := setupTestDB(t)
 	defer cleanup()
+	repo := repository.NewLessonRepository(db)
 
 	e := echo.New()
 	h := handler.NewLessonHandler(repo)

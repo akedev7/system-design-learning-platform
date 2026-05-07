@@ -67,7 +67,10 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
       id,
       type: "default",
       position: { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
-      data: { label: `${label} (${Object.values(nodeTypeMap).filter((_, i) => Object.keys(nodeTypeMap)[i] === nodeType).length + 1})` },
+      data: { 
+        label: `${label} (${Object.values(nodeTypeMap).filter((_, i) => Object.keys(nodeTypeMap)[i] === nodeType).length + 1})`,
+        testid: "flow-node"
+      },
       style: { background: color, border: "2px solid #333", borderRadius: "8px", padding: "10px", width: 120 },
     };
     setNodes((nds) => [...nds, newNode]);
@@ -158,7 +161,7 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
   const isPassed = validationResult?.valid || clientValidation?.valid;
 
   return (
-    <div className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
+    <div data-testid="diagram-block" className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
       <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
         System Design Exercise
       </h2>
@@ -167,6 +170,7 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
         {nodeTypeDefinitions.map((def) => (
           <button
             key={def.type}
+            data-testid="palette-node"
             onClick={() => addNode(def.type, def.label, def.color)}
             className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-900 transition-colors hover:opacity-80"
             style={{ background: def.color }}
@@ -176,7 +180,7 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
         ))}
       </div>
 
-      <div className="h-96 w-full overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700">
+      <div data-testid="react-flow-canvas" className="h-96 w-full overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -194,6 +198,7 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
 
       <div className="flex gap-3">
         <button
+          data-testid="validate-diagram-button"
           onClick={handleValidate}
           disabled={isValidating || nodes.length === 0}
           className="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-zinc-400"
@@ -207,6 +212,7 @@ export function ReactFlowDiagramBlock({ config, lessonId }: ReactFlowDiagramBloc
           Clear
         </button>
         <button
+          data-testid="quick-check-button"
           onClick={runClientValidation}
           disabled={nodes.length === 0}
           className="rounded-md bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-zinc-400"

@@ -64,8 +64,8 @@ export default function AdminCoursesPage() {
   if (loading) return <div>Loading...</div>
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Courses</h2>
+    <div data-testid="admin-dashboard">
+      <h2 data-testid="admin-heading" className="text-xl font-semibold mb-4">Courses</h2>
       
       <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 rounded shadow">
         <div className="mb-4">
@@ -87,9 +87,9 @@ export default function AdminCoursesPage() {
             rows={3}
           />
         </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          {editingCourse ? 'Update' : 'Create'} Course
-        </button>
+      <button type="submit" data-testid="create-course-button" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        {editingCourse ? 'Update' : 'Create'} Course
+      </button>
         {editingCourse && (
           <button
             type="button"

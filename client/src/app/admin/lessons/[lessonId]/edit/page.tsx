@@ -572,7 +572,7 @@ export default function EditLessonPage() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6">
+    <div data-testid="content-editor" className="min-h-screen bg-zinc-50 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -593,19 +593,19 @@ export default function EditLessonPage() {
         <div className="mb-6">
           <h3 className="font-medium mb-2">Add Block</h3>
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => addBlock("Text")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
+            <button data-testid="block-palette-text" onClick={() => addBlock("Text")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
               + Text
             </button>
-            <button onClick={() => addBlock("Image")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
+            <button data-testid="block-palette-image" onClick={() => addBlock("Image")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
               + Image
             </button>
-            <button onClick={() => addBlock("CodeSnippet")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
+            <button data-testid="block-palette-code" onClick={() => addBlock("CodeSnippet")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
               + Code
             </button>
-            <button onClick={() => addBlock("Quiz")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
+            <button data-testid="block-palette-quiz" onClick={() => addBlock("Quiz")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
               + Quiz
             </button>
-            <button onClick={() => addBlock("ReactFlowDiagram")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
+            <button data-testid="block-palette-diagram" onClick={() => addBlock("ReactFlowDiagram")} className="px-3 py-2 bg-zinc-200 rounded hover:bg-zinc-300">
               + Diagram
             </button>
           </div>

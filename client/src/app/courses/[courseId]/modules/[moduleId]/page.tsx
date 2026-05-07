@@ -152,7 +152,7 @@ function LessonItem({ lesson, courseId, moduleId }: { lesson: Lesson; courseId: 
   const isCompleted = progress?.passed;
 
   return (
-    <li>
+    <li data-testid="lesson-card">
       <a
         href={`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}
         className="block p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"

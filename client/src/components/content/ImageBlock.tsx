@@ -3,7 +3,7 @@ import { ImageConfig } from "@/lib/content-types";
 
 export function ImageBlock({ config }: { config: ImageConfig }) {
   return (
-    <figure className="my-6">
+    <figure data-testid="image-block" className="my-6">
       <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
         <Image
           src={config.src}

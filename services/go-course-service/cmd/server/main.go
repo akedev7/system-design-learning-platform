@@ -44,6 +44,22 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "Authorization"},
 	}))
 
+	// Mock auth middleware for local development when DISABLE_AUTH=true
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				// Set mock user claims for handlers
+				c.Set("auth0_id", "mock-user-123")
+				c.Set("claims", map[string]interface{}{
+					"sub":   "mock-user-123",
+					"email": "test@example.com",
+					"name":  "Test User",
+				})
+				return next(c)
+			}
+		})
+	}
+
 	e.GET("/actuator/health", func(c echo.Context) error {
 		if err := db.Ping(); err != nil {
 			return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "DOWN"})

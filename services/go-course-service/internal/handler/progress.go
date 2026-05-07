@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,11 +32,22 @@ func NewProgressHandler(progressRepo *repository.ProgressRepository, lessonRepo 
 }
 
 func (h *ProgressHandler) GetCourseProgress(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	// Get user ID, handling DISABLE_AUTH case
+	var userID string
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		userID = "mock-user-123"
+	} else {
+		token := c.Get("user")
+		if token == nil {
+			return c.JSON(http.StatusUnauthorized, response.Error("user not authenticated"))
+		}
+		tokenObj := token.(*jwt.Token)
+		claims := tokenObj.Claims.(jwt.MapClaims)
+		uid, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+		}
+		userID = uid
 	}
 
 	courseID, err := strconv.Atoi(c.Param("id"))
@@ -86,11 +98,22 @@ func (h *ProgressHandler) GetCourseProgress(c echo.Context) error {
 }
 
 func (h *ProgressHandler) GetModuleProgress(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	// Get user ID, handling DISABLE_AUTH case
+	var userID string
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		userID = "mock-user-123"
+	} else {
+		token := c.Get("user")
+		if token == nil {
+			return c.JSON(http.StatusUnauthorized, response.Error("user not authenticated"))
+		}
+		tokenObj := token.(*jwt.Token)
+		claims := tokenObj.Claims.(jwt.MapClaims)
+		uid, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+		}
+		userID = uid
 	}
 
 	moduleID, err := strconv.Atoi(c.Param("id"))
@@ -126,11 +149,22 @@ func (h *ProgressHandler) GetModuleProgress(c echo.Context) error {
 }
 
 func (h *ProgressHandler) GetLessonProgress(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	// Get user ID, handling DISABLE_AUTH case
+	var userID string
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		userID = "mock-user-123"
+	} else {
+		token := c.Get("user")
+		if token == nil {
+			return c.JSON(http.StatusUnauthorized, response.Error("user not authenticated"))
+		}
+		tokenObj := token.(*jwt.Token)
+		claims := tokenObj.Claims.(jwt.MapClaims)
+		uid, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+		}
+		userID = uid
 	}
 
 	lessonID, err := strconv.Atoi(c.Param("id"))
@@ -160,11 +194,22 @@ func (h *ProgressHandler) GetLessonProgress(c echo.Context) error {
 }
 
 func (h *ProgressHandler) GetResumeLesson(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	// Get user ID, handling DISABLE_AUTH case
+	var userID string
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		userID = "mock-user-123"
+	} else {
+		token := c.Get("user")
+		if token == nil {
+			return c.JSON(http.StatusUnauthorized, response.Error("user not authenticated"))
+		}
+		tokenObj := token.(*jwt.Token)
+		claims := tokenObj.Claims.(jwt.MapClaims)
+		uid, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+		}
+		userID = uid
 	}
 
 	courseID, err := strconv.Atoi(c.Param("id"))
@@ -221,11 +266,22 @@ func (h *ProgressHandler) GetResumeLesson(c echo.Context) error {
 }
 
 func (h *ProgressHandler) EnrollCourse(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	// Get user ID, handling DISABLE_AUTH case
+	var userID string
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		userID = "mock-user-123"
+	} else {
+		token := c.Get("user")
+		if token == nil {
+			return c.JSON(http.StatusUnauthorized, response.Error("user not authenticated"))
+		}
+		tokenObj := token.(*jwt.Token)
+		claims := tokenObj.Claims.(jwt.MapClaims)
+		uid, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+		}
+		userID = uid
 	}
 
 	courseID, err := strconv.Atoi(c.Param("id"))

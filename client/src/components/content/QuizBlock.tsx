@@ -63,7 +63,7 @@ export function QuizBlock({ config, lessonId }: QuizBlockProps) {
   };
 
   return (
-    <div className="space-y-6 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
+    <div data-testid="quiz-block" className="space-y-6 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
       <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
         Quiz
       </h2>

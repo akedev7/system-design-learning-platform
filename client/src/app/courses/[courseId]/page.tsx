@@ -134,7 +134,7 @@ export default function CoursePage() {
             ) : (
               <ul className="space-y-4">
                 {modules?.map((module) => (
-                  <li key={module.id}>
+                  <li key={module.id} data-testid="module-card">
                     <a
                       href={`/courses/${courseId}/modules/${module.id}`}
                       className="block p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
@@ -152,6 +152,25 @@ export default function CoursePage() {
                 ))}
               </ul>
             )}
+          </div>
+        )}
+
+        {!progress && (
+          <div className="mt-6">
+            <button
+              data-testid="enroll-button"
+              onClick={async () => {
+                try {
+                  await axios.post(`${API_BASE_URL}/api/v1/courses/${courseId}/enroll`);
+                  window.location.reload();
+                } catch (err) {
+                  console.error('Enrollment failed:', err);
+                }
+              }}
+              className="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              Enroll in Course
+            </button>
           </div>
         )}
       </main>
