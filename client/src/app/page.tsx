@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import AuthButton from "@/components/AuthButton";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -24,6 +25,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col flex-1 bg-zinc-50 font-sans dark:bg-black">
+      <header className="flex justify-end p-4">
+        <AuthButton />
+      </header>
       <main className="flex flex-1 w-full max-w-3xl flex-col py-16 px-4 mx-auto bg-white dark:bg-black sm:py-32 sm:px-16">
         <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50 mb-8">
           Course Catalog
