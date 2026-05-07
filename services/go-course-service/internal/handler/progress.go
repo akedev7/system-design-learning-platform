@@ -219,3 +219,40 @@ func (h *ProgressHandler) GetResumeLesson(c echo.Context) error {
 
 	return c.JSON(http.StatusNotFound, response.Error("no lessons found"))
 }
+
+func (h *ProgressHandler) EnrollCourse(c echo.Context) error {
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID, ok := claims["sub"].(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
+	}
+
+	courseID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Error("invalid course id"))
+	}
+
+	course, err := h.courseRepo.GetByID(courseID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
+	}
+	if course == nil {
+		return c.JSON(http.StatusNotFound, response.Error("course not found"))
+	}
+
+	existingProgress, err := h.progressRepo.GetCourseProgress(userID, courseID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
+	}
+	if existingProgress != nil {
+		return c.JSON(http.StatusOK, response.Success(existingProgress))
+	}
+
+	enrollment, err := h.progressRepo.UpsertCourseProgress(userID, courseID, 0)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
+	}
+
+	return c.JSON(http.StatusCreated, response.Success(enrollment))
+}

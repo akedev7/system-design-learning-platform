@@ -97,6 +97,7 @@ func main() {
 	api.GET("/modules/:id/progress", progressHandler.GetModuleProgress)
 	api.GET("/lessons/:id/progress", progressHandler.GetLessonProgress)
 	api.GET("/courses/:id/resume", progressHandler.GetResumeLesson)
+	api.POST("/courses/:id/enroll", progressHandler.EnrollCourse)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }
