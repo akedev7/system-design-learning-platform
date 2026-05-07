@@ -12,6 +12,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Auth     AuthConfig
+	S3       S3Config
 }
 
 type ServerConfig struct {
@@ -34,6 +35,17 @@ type AuthConfig struct {
 	Issuer   string
 }
 
+type S3Config struct {
+	Endpoint        string
+	Region         string
+	Bucket         string
+	AccessKey      string
+	SecretKey      string
+	UseSSL         bool
+	ForcePathStyle bool
+	PublicURL      string
+}
+
 func Load() (*Config, error) {
 	// Load .env file if it exists
 	_ = godotenv.Load()
@@ -54,6 +66,10 @@ func Load() (*Config, error) {
 	v.SetDefault("database.password", "postgres")
 	v.SetDefault("database.dbname", "courses")
 	v.SetDefault("database.sslmode", "disable")
+	v.SetDefault("s3.region", "auto")
+	v.SetDefault("s3.bucket", "uploads")
+	v.SetDefault("s3.useSSL", true)
+	v.SetDefault("s3.forcePathStyle", true)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -101,6 +117,24 @@ func applyEnvOverrides(cfg *Config) {
 	}
 	if issuer := os.Getenv("AUTH_ISSUER"); issuer != "" {
 		cfg.Auth.Issuer = issuer
+	}
+	if endpoint := os.Getenv("S3_ENDPOINT"); endpoint != "" {
+		cfg.S3.Endpoint = endpoint
+	}
+	if region := os.Getenv("S3_REGION"); region != "" {
+		cfg.S3.Region = region
+	}
+	if bucket := os.Getenv("S3_BUCKET"); bucket != "" {
+		cfg.S3.Bucket = bucket
+	}
+	if accessKey := os.Getenv("S3_ACCESS_KEY"); accessKey != "" {
+		cfg.S3.AccessKey = accessKey
+	}
+	if secretKey := os.Getenv("S3_SECRET_KEY"); secretKey != "" {
+		cfg.S3.SecretKey = secretKey
+	}
+	if publicURL := os.Getenv("S3_PUBLIC_URL"); publicURL != "" {
+		cfg.S3.PublicURL = publicURL
 	}
 }
 

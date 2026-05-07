@@ -12,6 +12,7 @@ import (
 	"go-course-service/internal/handler"
 	appMiddleware "go-course-service/internal/middleware"
 	"go-course-service/internal/repository"
+	"go-course-service/internal/storage"
 )
 
 func main() {
@@ -98,6 +99,17 @@ func main() {
 	api.GET("/lessons/:id/progress", progressHandler.GetLessonProgress)
 	api.GET("/courses/:id/resume", progressHandler.GetResumeLesson)
 	api.POST("/courses/:id/enroll", progressHandler.EnrollCourse)
+
+	var uploadHandler *handler.UploadHandler
+	if cfg.S3.Endpoint != "" {
+		s3Client, err := storage.NewS3Client(&cfg.S3)
+		if err != nil {
+			fmt.Printf("Warning: Failed to initialize S3 client: %v\n", err)
+		} else {
+			uploadHandler = handler.NewUploadHandler(s3Client)
+			admin.POST("/uploads/generate-url", uploadHandler.GenerateUploadURL)
+		}
+	}
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }

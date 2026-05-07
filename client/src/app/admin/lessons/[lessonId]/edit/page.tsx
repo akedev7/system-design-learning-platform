@@ -133,12 +133,58 @@ function TextBlockEditor({ config, onChange }: { config: { content: string }; on
 }
 
 function ImageBlockEditor({ config, onChange }: { config: { src: string; alt: string; caption?: string }; onChange: (config: Record<string, unknown>) => void }) {
+  const [uploading, setUploading] = useState(false);
+
   const handleUrlChange = (field: string, value: string) => {
     onChange({ ...config, [field]: value });
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const res = await fetch("/api/v1/uploads/generate-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+        }),
+      });
+      const data = await res.json();
+      if (data.data?.uploadURL) {
+        await fetch(data.data.uploadURL, {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": file.type },
+        });
+        onChange({ ...config, src: data.data.publicURL });
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="space-y-3">
+      <div>
+        <label className="block text-sm font-medium mb-1">Upload Image</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          disabled={uploading}
+          className="w-full px-3 py-2 border rounded"
+        />
+        {uploading && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-500">or</span>
+      </div>
       <div>
         <label className="block text-sm font-medium mb-1">Image URL</label>
         <input
@@ -149,6 +195,11 @@ function ImageBlockEditor({ config, onChange }: { config: { src: string; alt: st
           placeholder="https://..."
         />
       </div>
+      {config.src && (
+        <div className="mt-2">
+          <img src={config.src} alt="Preview" className="max-h-40 rounded" />
+        </div>
+      )}
       <div>
         <label className="block text-sm font-medium mb-1">Alt Text</label>
         <input
