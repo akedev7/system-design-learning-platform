@@ -19,12 +19,13 @@ const fetchLesson = async (lessonId: string): Promise<Lesson> => {
   return response.data;
 };
 
-import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig } from "@/lib/content-types";
+import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig, QuizConfig } from "@/lib/content-types";
 import { TextBlock } from "@/components/content/TextBlock";
 import { ImageBlock } from "@/components/content/ImageBlock";
 import { CodeSnippetBlock } from "@/components/content/CodeSnippetBlock";
+import { QuizBlock } from "@/components/content/QuizBlock";
 
-function ContentBlockRenderer({ block }: { block: ContentBlock }) {
+function ContentBlockRenderer({ block, lessonId }: { block: ContentBlock; lessonId: number }) {
   switch (block.type) {
     case "Text":
       return <TextBlock config={block.config as TextConfig} />;
@@ -32,6 +33,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
       return <ImageBlock config={block.config as ImageConfig} />;
     case "CodeSnippet":
       return <CodeSnippetBlock config={block.config as CodeSnippetConfig} />;
+    case "Quiz":
+      return <QuizBlock config={block.config as QuizConfig} lessonId={lessonId} />;
     default:
       return null;
   }
@@ -68,7 +71,7 @@ export default function LessonPage() {
         {!isLoading && lesson?.contentJsonb && (
           <div className="space-y-6">
             {lesson.contentJsonb.map((block, index) => (
-              <ContentBlockRenderer key={index} block={block} />
+              <ContentBlockRenderer key={index} block={block} lessonId={lesson.id} />
             ))}
           </div>
         )}

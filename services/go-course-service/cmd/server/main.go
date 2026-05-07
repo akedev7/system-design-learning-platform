@@ -75,6 +75,11 @@ func main() {
 	api.GET("/modules/:moduleId/lessons", lessonHandler.GetLessonsByModuleID)
 	api.GET("/lessons/:id", lessonHandler.GetLessonByID)
 
+	// Quiz handlers
+	progressRepo := repository.NewProgressRepository(db)
+	quizHandler := handler.NewQuizHandler(lessonRepo, progressRepo)
+	api.POST("/lessons/:id/submit-quiz", quizHandler.SubmitQuiz)
+
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }
