@@ -82,6 +82,7 @@ func main() {
 
 	admin.POST("/lessons", lessonHandler.CreateLesson)
 	admin.PUT("/lessons/:id", lessonHandler.UpdateLesson)
+	admin.PUT("/lessons/:id/content", lessonHandler.UpdateContent)
 	admin.DELETE("/lessons/:id", lessonHandler.DeleteLesson)
 
 	progressRepo := repository.NewProgressRepository(db)

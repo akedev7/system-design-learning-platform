@@ -121,3 +121,30 @@ func (h *LessonHandler) DeleteLesson(c echo.Context) error {
 	}
 	return c.JSON(http.StatusNoContent, nil)
 }
+
+type UpdateContentRequest struct {
+	ContentJSON json.RawMessage `json:"contentJsonb"`
+}
+
+func (h *LessonHandler) UpdateContent(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+	}
+
+	var req UpdateContentRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+	}
+
+	lesson, err := h.repo.UpdateContent(id, req.ContentJSON)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	if lesson == nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+	}
+
+	return c.JSON(http.StatusOK, lesson)
+}

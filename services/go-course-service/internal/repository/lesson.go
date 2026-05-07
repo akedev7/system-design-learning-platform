@@ -75,3 +75,18 @@ func (r *LessonRepository) Delete(id int) error {
 	}
 	return nil
 }
+
+func (r *LessonRepository) UpdateContent(id int, contentJSON []byte) (*models.Lesson, error) {
+	var updatedLesson models.Lesson
+	err := r.db.Get(&updatedLesson,
+		`UPDATE lessons SET content_jsonb = $1, updated_at = CURRENT_TIMESTAMP
+		 WHERE id = $2 RETURNING id, module_id, title, description, content_jsonb, order_index, created_at, updated_at`,
+		contentJSON, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to update lesson content: %w", err)
+	}
+	return &updatedLesson, nil
+}
