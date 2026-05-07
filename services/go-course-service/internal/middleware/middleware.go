@@ -17,6 +17,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"go-course-service/internal/config"
+	"go-course-service/internal/models"
 )
 
 type JWKS struct {
@@ -203,6 +204,65 @@ func AuthMiddleware(cfg *config.AuthConfig) echo.MiddlewareFunc {
 
 			c.Set("auth0_id", auth0ID)
 			c.Set("user", token)
+			c.Set("claims", claims)
+			return next(c)
+		}
+	}
+}
+
+type UserRepo interface {
+	GetByAuth0ID(auth0ID string) (*models.User, error)
+	Create(user *models.User) (*models.User, error)
+}
+
+func JITUserMiddleware(userRepo UserRepo) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			auth0ID := c.Get("auth0_id")
+			if auth0ID == nil {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
+			}
+
+			auth0IDStr, ok := auth0ID.(string)
+			if !ok {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid auth0_id"})
+			}
+
+			existingUser, err := userRepo.GetByAuth0ID(auth0IDStr)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to check user"})
+			}
+
+			if existingUser == nil {
+				claims := c.Get("claims")
+				if claims != nil {
+					claimMap, ok := claims.(jwt.MapClaims)
+					if ok {
+						email, _ := claimMap["email"].(string)
+						name, _ := claimMap["name"].(string)
+						if email == "" {
+							email = auth0IDStr + "@auth0.user"
+						}
+						if name == "" {
+							name = "User"
+						}
+
+						newUser, err := userRepo.Create(&models.User{
+							Auth0ID: auth0IDStr,
+							Email:   email,
+							Name:   name,
+							Role:   "Learner",
+						})
+						if err != nil {
+							return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to create user"})
+						}
+						c.Set("db_user", newUser)
+					}
+				}
+			} else {
+				c.Set("db_user", existingUser)
+			}
+
 			return next(c)
 		}
 	}
