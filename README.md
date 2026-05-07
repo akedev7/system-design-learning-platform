@@ -68,6 +68,23 @@ Both the frontend and backend support hot-reload during development:
 - Credentials: postgres/postgres (configurable via environment variables)
 - Migrations: golang-migrate (see `services/go-course-service/migrations/`)
 
+## First Admin Setup
+
+The first admin user is seeded via migration `000007_seed_admin_user.up.sql`. 
+
+**To configure your admin account:**
+
+1. After logging in with Auth0 for the first time, find your Auth0 `sub` claim
+2. Update the seeded admin user's auth0_id in the database:
+
+```sql
+UPDATE users 
+SET auth0_id = 'your-auth0-sub-claim' 
+WHERE email = 'admin@example.com';
+```
+
+Or create a fresh migration with your Auth0 ID before running migrations.
+
 ## API Response Format
 
 All API responses use a standardized envelope format:
