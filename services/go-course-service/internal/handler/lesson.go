@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go-course-service/internal/models"
 	"go-course-service/internal/repository"
+	"go-course-service/internal/response"
 )
 
 type LessonHandler struct {
@@ -21,33 +22,33 @@ func NewLessonHandler(repo *repository.LessonRepository) *LessonHandler {
 func (h *LessonHandler) GetLessonsByModuleID(c echo.Context) error {
 	moduleID, err := strconv.Atoi(c.Param("moduleId"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid module id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid module id"))
 	}
 
 	lessons, err := h.repo.GetByModuleID(moduleID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, lessons)
+	return c.JSON(http.StatusOK, response.Success(lessons))
 }
 
 func (h *LessonHandler) GetLessonByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid lesson id"))
 	}
 
 	lesson, err := h.repo.GetByID(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
 	if lesson == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+		return c.JSON(http.StatusNotFound, response.Error("lesson not found"))
 	}
 
-	return c.JSON(http.StatusOK, lesson)
+	return c.JSON(http.StatusOK, response.Success(lesson))
 }
 
 type CreateLessonRequest struct {
@@ -61,11 +62,11 @@ type CreateLessonRequest struct {
 func (h *LessonHandler) CreateLesson(c echo.Context) error {
 	var req CreateLessonRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	if req.Title == "" || req.ModuleID == 0 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "title and moduleId are required"})
+		return c.JSON(http.StatusBadRequest, response.Error("title and moduleId are required"))
 	}
 
 	lesson, err := h.repo.Create(&models.Lesson{
@@ -76,20 +77,20 @@ func (h *LessonHandler) CreateLesson(c echo.Context) error {
 		OrderIndex:  req.OrderIndex,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
-	return c.JSON(http.StatusCreated, lesson)
+	return c.JSON(http.StatusCreated, response.Success(lesson))
 }
 
 func (h *LessonHandler) UpdateLesson(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid lesson id"))
 	}
 
 	var req CreateLessonRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	lesson, err := h.repo.Update(&models.Lesson{
@@ -101,25 +102,25 @@ func (h *LessonHandler) UpdateLesson(c echo.Context) error {
 		OrderIndex:  req.OrderIndex,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 	if lesson == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+		return c.JSON(http.StatusNotFound, response.Error("lesson not found"))
 	}
-	return c.JSON(http.StatusOK, lesson)
+	return c.JSON(http.StatusOK, response.Success(lesson))
 }
 
 func (h *LessonHandler) DeleteLesson(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid lesson id"))
 	}
 
 	err = h.repo.Delete(id)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+		return c.JSON(http.StatusNotFound, response.Error("lesson not found"))
 	}
-	return c.JSON(http.StatusNoContent, nil)
+	return c.NoContent(http.StatusNoContent)
 }
 
 type UpdateContentRequest struct {
@@ -129,22 +130,22 @@ type UpdateContentRequest struct {
 func (h *LessonHandler) UpdateContent(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid lesson id"))
 	}
 
 	var req UpdateContentRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	lesson, err := h.repo.UpdateContent(id, req.ContentJSON)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
 	if lesson == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+		return c.JSON(http.StatusNotFound, response.Error("lesson not found"))
 	}
 
-	return c.JSON(http.StatusOK, lesson)
+	return c.JSON(http.StatusOK, response.Success(lesson))
 }

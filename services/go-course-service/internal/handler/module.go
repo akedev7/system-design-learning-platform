@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go-course-service/internal/models"
 	"go-course-service/internal/repository"
+	"go-course-service/internal/response"
 )
 
 type ModuleHandler struct {
@@ -20,33 +21,33 @@ func NewModuleHandler(repo *repository.ModuleRepository) *ModuleHandler {
 func (h *ModuleHandler) GetModulesByCourseID(c echo.Context) error {
 	courseID, err := strconv.Atoi(c.Param("courseId"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid course id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid course id"))
 	}
 
 	modules, err := h.repo.GetByCourseID(courseID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, modules)
+	return c.JSON(http.StatusOK, response.Success(modules))
 }
 
 func (h *ModuleHandler) GetModuleByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid module id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid module id"))
 	}
 
 	module, err := h.repo.GetByID(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
 	if module == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "module not found"})
+		return c.JSON(http.StatusNotFound, response.Error("module not found"))
 	}
 
-	return c.JSON(http.StatusOK, module)
+	return c.JSON(http.StatusOK, response.Success(module))
 }
 
 type CreateModuleRequest struct {
@@ -59,11 +60,11 @@ type CreateModuleRequest struct {
 func (h *ModuleHandler) CreateModule(c echo.Context) error {
 	var req CreateModuleRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	if req.Title == "" || req.CourseID == 0 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "title and courseId are required"})
+		return c.JSON(http.StatusBadRequest, response.Error("title and courseId are required"))
 	}
 
 	module, err := h.repo.Create(&models.Module{
@@ -73,20 +74,20 @@ func (h *ModuleHandler) CreateModule(c echo.Context) error {
 		OrderIndex:  req.OrderIndex,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
-	return c.JSON(http.StatusCreated, module)
+	return c.JSON(http.StatusCreated, response.Success(module))
 }
 
 func (h *ModuleHandler) UpdateModule(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid module id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid module id"))
 	}
 
 	var req CreateModuleRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	module, err := h.repo.Update(&models.Module{
@@ -97,23 +98,23 @@ func (h *ModuleHandler) UpdateModule(c echo.Context) error {
 		OrderIndex:  req.OrderIndex,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 	if module == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "module not found"})
+		return c.JSON(http.StatusNotFound, response.Error("module not found"))
 	}
-	return c.JSON(http.StatusOK, module)
+	return c.JSON(http.StatusOK, response.Success(module))
 }
 
 func (h *ModuleHandler) DeleteModule(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid module id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid module id"))
 	}
 
 	err = h.repo.Delete(id)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "module not found"})
+		return c.JSON(http.StatusNotFound, response.Error("module not found"))
 	}
-	return c.JSON(http.StatusNoContent, nil)
+	return c.NoContent(http.StatusNoContent)
 }

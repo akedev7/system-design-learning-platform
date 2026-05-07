@@ -10,6 +10,7 @@ import (
 	"go-course-service/internal/models"
 	"go-course-service/internal/repository"
 	"go-course-service/internal/service"
+	"go-course-service/internal/response"
 )
 
 type QuizHandler struct {
@@ -29,26 +30,26 @@ func NewQuizHandler(lessonRepo *repository.LessonRepository, progressRepo *repos
 func (h *QuizHandler) SubmitQuiz(c echo.Context) error {
 	lessonID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid lesson id"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid lesson id"))
 	}
 
 	lesson, err := h.lessonRepo.GetByID(lessonID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
 	if lesson == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "lesson not found"})
+		return c.JSON(http.StatusNotFound, response.Error("lesson not found"))
 	}
 
 	var req models.QuizAnswerRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request body"))
 	}
 
 	quiz, err := extractQuizFromContent(lesson.ContentJSON)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "no quiz found in lesson content"})
+		return c.JSON(http.StatusBadRequest, response.Error("no quiz found in lesson content"))
 	}
 
 	result := h.quizService.GradeQuiz(*quiz, req.Answers)
@@ -57,18 +58,18 @@ func (h *QuizHandler) SubmitQuiz(c echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 	sub, ok := claims["sub"].(string)
 	if !ok {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid token claims"})
+		return c.JSON(http.StatusUnauthorized, response.Error("invalid token claims"))
 	}
 
 	progress, err := h.progressRepo.UpsertProgress(sub, lessonID, result.Score, result.Passed)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to save progress"})
+		return c.JSON(http.StatusInternalServerError, response.Error("failed to save progress"))
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, response.Success(map[string]interface{}{
 		"result":   result,
 		"progress": progress,
-	})
+	}))
 }
 
 func extractQuizFromContent(contentJSON json.RawMessage) (*models.Quiz, error) {

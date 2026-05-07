@@ -68,6 +68,38 @@ Both the frontend and backend support hot-reload during development:
 - Credentials: postgres/postgres (configurable via environment variables)
 - Migrations: golang-migrate (see `services/go-course-service/migrations/`)
 
+## API Response Format
+
+All API responses use a standardized envelope format:
+
+```json
+{
+  "status": "success" | "error",
+  "data": {},
+  "message": ""
+}
+```
+
+Example success response:
+```json
+{
+  "status": "success",
+  "data": [
+    { "id": 1, "title": "System Design 101" }
+  ]
+}
+```
+
+Example error response:
+```json
+{
+  "status": "error",
+  "message": "course not found"
+}
+```
+
+Use the `api.ts` client library in `client/src/lib/api.ts` for consistent API calls with interceptor handling.
+
 ## Environment Variables
 
 See `.env.example` for all available configuration options.
