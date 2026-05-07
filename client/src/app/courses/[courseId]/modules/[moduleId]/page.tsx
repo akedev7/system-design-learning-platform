@@ -16,7 +16,8 @@ interface Lesson {
 
 const fetchLessons = async (moduleId: string): Promise<Lesson[]> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/modules/${moduleId}/lessons`);
-  return response.data;
+  // API returns {status: "success", data: [...]}
+  return response.data.data || [];
 };
 
 interface Module {
@@ -28,7 +29,8 @@ interface Module {
 
 const fetchModule = async (moduleId: string): Promise<Module> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/modules/${moduleId}`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 interface ModuleProgress {
@@ -40,7 +42,8 @@ interface ModuleProgress {
 
 const fetchModuleProgress = async (moduleId: string): Promise<ModuleProgress> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/modules/${moduleId}/progress`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 interface LessonProgress {
@@ -52,7 +55,8 @@ interface LessonProgress {
 
 const fetchLessonProgress = async (lessonId: string): Promise<LessonProgress> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/lessons/${lessonId}/progress`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 export default function ModulePage() {

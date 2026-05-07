@@ -16,7 +16,8 @@ interface Lesson {
 
 const fetchLesson = async (lessonId: string): Promise<Lesson> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/lessons/${lessonId}`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig, QuizConfig, ReactFlowDiagramConfig } from "@/lib/content-types";

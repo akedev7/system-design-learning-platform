@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { auth0 } from './lib/auth0'
+
+// For local testing without Auth0, set DISABLE_AUTH=true in docker-compose environment
+const disableAuth = process.env.DISABLE_AUTH === 'true'
 
 export async function middleware(request: NextRequest) {
+  // Bypass auth for local development
+  if (disableAuth) {
+    return NextResponse.next()
+  }
+
+  // Dynamic import to avoid loading Auth0 when disabled
+  const { auth0 } = await import('./lib/auth0')
+
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const session = await auth0.getSession(request)
 

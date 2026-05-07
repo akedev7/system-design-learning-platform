@@ -53,9 +53,10 @@ out/
 thought_process.log
 test_results.json
 recon_output.txt
+test-results/
 
-# GitHub (workflows are needed for CI/CD)
-# .github/
+# Agent skills (local development)
+.agents/skills/playwright-cli/
 
 # Temporary files
 *.tmp

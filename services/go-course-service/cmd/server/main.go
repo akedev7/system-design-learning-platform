@@ -38,6 +38,11 @@ func main() {
 	e.Debug = cfg.Server.Debug
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
+	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "Authorization"},
+	}))
 
 	e.GET("/actuator/health", func(c echo.Context) error {
 		if err := db.Ping(); err != nil {
@@ -54,7 +59,10 @@ func main() {
 	})
 
 	api := e.Group("/api/v1")
-	api.Use(appMiddleware.AuthMiddleware(&cfg.Auth))
+	// Bypass auth for local development if DISABLE_AUTH=true
+	if os.Getenv("DISABLE_AUTH") != "true" {
+		api.Use(appMiddleware.AuthMiddleware(&cfg.Auth))
+	}
 
 	courseRepo := repository.NewCourseRepository(db)
 	courseHandler := handler.NewCourseHandler(courseRepo)
@@ -62,7 +70,10 @@ func main() {
 	api.GET("/courses/:id", courseHandler.GetCourseByID)
 
 	admin := api.Group("")
-	admin.Use(appMiddleware.AdminMiddleware(db))
+	// Bypass admin check for local development if DISABLE_AUTH=true
+	if os.Getenv("DISABLE_AUTH") != "true" {
+		admin.Use(appMiddleware.AdminMiddleware(db))
+	}
 	admin.POST("/courses", courseHandler.CreateCourse)
 	admin.PUT("/courses/:id", courseHandler.UpdateCourse)
 	admin.DELETE("/courses/:id", courseHandler.DeleteCourse)

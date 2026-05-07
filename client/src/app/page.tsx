@@ -14,7 +14,8 @@ interface Course {
 
 const fetchCourses = async (): Promise<Course[]> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/courses`);
-  return response.data;
+  // API returns {status: "success", data: [...]}
+  return response.data.data || [];
 };
 
 export default function Home() {
@@ -43,14 +44,16 @@ export default function Home() {
                 {courses?.map((course) => (
                   <li
                     key={course.id}
-                    className="p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg"
+                    className="p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
                   >
-                    <h2 className="text-xl font-medium text-black dark:text-zinc-50">
-                      {course.title}
-                    </h2>
-                    <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-                      {course.description}
-                    </p>
+                    <a href={`/courses/${course.id}`} className="block">
+                      <h2 className="text-xl font-medium text-black dark:text-zinc-50 hover:text-blue-600 dark:hover:text-blue-400">
+                        {course.title}
+                      </h2>
+                      <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+                        {course.description}
+                      </p>
+                    </a>
                   </li>
                 ))}
               </ul>

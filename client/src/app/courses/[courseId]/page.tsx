@@ -17,7 +17,8 @@ interface Module {
 
 const fetchModules = async (courseId: string): Promise<Module[]> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/courses/${courseId}/modules`);
-  return response.data;
+  // API returns {status: "success", data: [...]}
+  return response.data.data || [];
 };
 
 interface Course {
@@ -28,7 +29,8 @@ interface Course {
 
 const fetchCourse = async (courseId: string): Promise<Course> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/courses/${courseId}`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 interface CourseProgress {
@@ -42,7 +44,8 @@ interface CourseProgress {
 
 const fetchCourseProgress = async (courseId: string): Promise<CourseProgress> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/courses/${courseId}/progress`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 interface ResumeLesson {
@@ -53,7 +56,8 @@ interface ResumeLesson {
 
 const fetchResumeLesson = async (courseId: string): Promise<ResumeLesson> => {
   const response = await axios.get(`${API_BASE_URL}/api/v1/courses/${courseId}/resume`);
-  return response.data;
+  // API returns {status: "success", data: {...}}
+  return response.data.data || null;
 };
 
 export default function CoursePage() {
