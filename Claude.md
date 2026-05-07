@@ -6,12 +6,13 @@ This is a monorepo containing multiple microservices. Each service resides in it
 ## Repository Structure
 
 ```
-docker-sandbox-test/
+system-design-learning-platform/
 ├── Claude.md                    # This file - Root service map
 ├── .github/
 │   └── workflows/               # CI/CD and agent workflows
 ├── services/
-│   └── spring-boot-service/     # Spring Boot service
+│   └── go-course-service/       # Go (Echo + sqlx) backend service
+├── client/                      # Next.js frontend
 └── scripts/
     ├── recon.sh                 # File tree generation
     └── setup-sandbox.sh         # Sandbox setup helper

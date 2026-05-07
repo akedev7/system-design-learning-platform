@@ -1,6 +1,6 @@
 # System Design Learning Platform
 
-A Next.js + Spring Boot web application for interactive system design learning, inspired by Brilliant's hands-on exercise model.
+A Next.js + Go web application for interactive system design learning, inspired by Brilliant's hands-on exercise model.
 
 ## Language
 

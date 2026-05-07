@@ -1,7 +1,8 @@
-# Use jOOQ for PostgreSQL persistence
+# Use sqlx for PostgreSQL persistence in Go backend
 
-We chose jOOQ (type-safe SQL builder) with Flyway migrations over JPA/Hibernate for Spring Boot's PostgreSQL access. jOOQ gives explicit query control, native JSONB support via custom converters, and compile-time type safety from schema-generated code, at the cost of more boilerplate than JPA for simple CRUD.
+We chose sqlx (lightweight SQL extension for Go's database/sql) over ORMs like GORM for the Go backend's PostgreSQL access. sqlx provides struct scanning for query results, minimal boilerplate, and full control over raw SQL queries, at the cost of less built-in migration tooling compared to opinionated ORMs.
 
 ## Considered Options
-- **JPA/Hibernate**: Standard Spring Boot ORM, faster initial CRUD development, but less control over JSONB column mapping and SQL query behavior.
-- **jOOQ**: Type-safe SQL builder, requires Flyway for schema versioning and manual query writing, but avoids JPA's lazy loading pitfalls and magic behavior.
+- **GORM**: Popular Go ORM with automatic migrations and CRUD helpers, but adds heavy abstraction and less explicit query control.
+- **database/sql**: Go standard library SQL interface, no struct scanning support, requires more boilerplate for row mapping.
+- **sqlx**: Lightweight extension to database/sql with struct scanning, preserves full control over raw SQL, aligns with the migrated Go service's explicit query needs.
