@@ -31,6 +31,30 @@ const fetchModule = async (moduleId: string): Promise<Module> => {
   return response.data;
 };
 
+interface ModuleProgress {
+  moduleId: number;
+  totalLessons: number;
+  completedLessons: number;
+  completionPercentage: number;
+}
+
+const fetchModuleProgress = async (moduleId: string): Promise<ModuleProgress> => {
+  const response = await axios.get(`${API_BASE_URL}/api/v1/modules/${moduleId}/progress`);
+  return response.data;
+};
+
+interface LessonProgress {
+  lessonId: number;
+  score: number;
+  passed: boolean;
+  completedAt?: string;
+}
+
+const fetchLessonProgress = async (lessonId: string): Promise<LessonProgress> => {
+  const response = await axios.get(`${API_BASE_URL}/api/v1/lessons/${lessonId}/progress`);
+  return response.data;
+};
+
 export default function ModulePage() {
   const params = useParams();
   const courseId = params.courseId as string;
@@ -48,6 +72,13 @@ export default function ModulePage() {
     enabled: !!moduleId,
   });
 
+  const { data: moduleProgress } = useQuery({
+    queryKey: ["moduleProgress", moduleId],
+    queryFn: () => fetchModuleProgress(moduleId),
+    enabled: !!moduleId,
+    retry: false,
+  });
+
   return (
     <div className="flex flex-col flex-1 bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col py-16 px-4 mx-auto bg-white dark:bg-black sm:py-32 sm:px-16">
@@ -61,8 +92,27 @@ export default function ModulePage() {
           {module?.title || "Loading..."}
         </h1>
         {module?.description && (
-          <p className="text-zinc-600 dark:text-zinc-400 mb-8">{module.description}</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-4">{module.description}</p>
         )}
+
+        {moduleProgress && moduleProgress.completionPercentage > 0 && (
+          <div className="mb-6 p-4 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Module Progress</span>
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{moduleProgress.completionPercentage}%</span>
+            </div>
+            <div className="w-full bg-zinc-300 dark:bg-zinc-600 rounded-full h-2">
+              <div
+                className="bg-green-600 h-2 rounded-full transition-all"
+                style={{ width: `${moduleProgress.completionPercentage}%` }}
+              />
+            </div>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              {moduleProgress.completedLessons} of {moduleProgress.totalLessons} lessons completed
+            </p>
+          </div>
+        )}
+
         <h2 className="text-2xl font-medium text-black dark:text-zinc-50 mb-4">Lessons</h2>
         {isLoading && <p className="text-zinc-600 dark:text-zinc-400">Loading lessons...</p>}
         {!isLoading && (
@@ -72,21 +122,12 @@ export default function ModulePage() {
             ) : (
               <ul className="space-y-4">
                 {lessons?.map((lesson) => (
-                  <li key={lesson.id}>
-                    <a
-                      href={`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}
-                      className="block p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
-                    >
-                      <h3 className="text-xl font-medium text-black dark:text-zinc-50">
-                        {lesson.orderIndex + 1}. {lesson.title}
-                      </h3>
-                      {lesson.description && (
-                        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-                          {lesson.description}
-                        </p>
-                      )}
-                    </a>
-                  </li>
+                  <LessonItem
+                    key={lesson.id}
+                    lesson={lesson}
+                    courseId={courseId}
+                    moduleId={moduleId}
+                  />
                 ))}
               </ul>
             )}
@@ -94,5 +135,47 @@ export default function ModulePage() {
         )}
       </main>
     </div>
+  );
+}
+
+function LessonItem({ lesson, courseId, moduleId }: { lesson: Lesson; courseId: string; moduleId: string }) {
+  const { data: progress } = useQuery({
+    queryKey: ["lessonProgress", lesson.id],
+    queryFn: () => fetchLessonProgress(String(lesson.id)),
+    retry: false,
+  });
+
+  const isCompleted = progress?.passed;
+
+  return (
+    <li>
+      <a
+        href={`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}
+        className="block p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          {isCompleted ? (
+            <span className="text-green-600 text-xl">✓</span>
+          ) : (
+            <span className="text-zinc-400 text-xl">○</span>
+          )}
+          <div className="flex-1">
+            <h3 className="text-xl font-medium text-black dark:text-zinc-50">
+              {lesson.orderIndex + 1}. {lesson.title}
+            </h3>
+            {lesson.description && (
+              <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+                {lesson.description}
+              </p>
+            )}
+          </div>
+          {progress && progress.score > 0 && (
+            <span className={`text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-zinc-500'}`}>
+              {progress.score}%
+            </span>
+          )}
+        </div>
+      </a>
+    </li>
   );
 }

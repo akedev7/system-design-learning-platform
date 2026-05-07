@@ -19,11 +19,12 @@ const fetchLesson = async (lessonId: string): Promise<Lesson> => {
   return response.data;
 };
 
-import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig, QuizConfig } from "@/lib/content-types";
+import { ContentBlock, TextConfig, ImageConfig, CodeSnippetConfig, QuizConfig, ReactFlowDiagramConfig } from "@/lib/content-types";
 import { TextBlock } from "@/components/content/TextBlock";
 import { ImageBlock } from "@/components/content/ImageBlock";
 import { CodeSnippetBlock } from "@/components/content/CodeSnippetBlock";
 import { QuizBlock } from "@/components/content/QuizBlock";
+import { ReactFlowDiagramBlock } from "@/components/content/ReactFlowDiagramBlock";
 
 function ContentBlockRenderer({ block, lessonId }: { block: ContentBlock; lessonId: number }) {
   switch (block.type) {
@@ -35,6 +36,8 @@ function ContentBlockRenderer({ block, lessonId }: { block: ContentBlock; lesson
       return <CodeSnippetBlock config={block.config as CodeSnippetConfig} />;
     case "Quiz":
       return <QuizBlock config={block.config as QuizConfig} lessonId={lessonId} />;
+    case "ReactFlowDiagram":
+      return <ReactFlowDiagramBlock config={block.config as ReactFlowDiagramConfig} lessonId={lessonId} />;
     default:
       return null;
   }

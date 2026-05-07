@@ -82,11 +82,21 @@ func main() {
 
 	admin.POST("/lessons", lessonHandler.CreateLesson)
 	admin.PUT("/lessons/:id", lessonHandler.UpdateLesson)
+	admin.PUT("/lessons/:id/content", lessonHandler.UpdateContent)
 	admin.DELETE("/lessons/:id", lessonHandler.DeleteLesson)
 
 	progressRepo := repository.NewProgressRepository(db)
 	quizHandler := handler.NewQuizHandler(lessonRepo, progressRepo)
 	api.POST("/lessons/:id/submit-quiz", quizHandler.SubmitQuiz)
+
+	diagramHandler := handler.NewDiagramHandler(lessonRepo, progressRepo)
+	api.POST("/lessons/:id/validate-diagram", diagramHandler.ValidateDiagram)
+
+	progressHandler := handler.NewProgressHandler(progressRepo, lessonRepo, moduleRepo, courseRepo)
+	api.GET("/courses/:id/progress", progressHandler.GetCourseProgress)
+	api.GET("/modules/:id/progress", progressHandler.GetModuleProgress)
+	api.GET("/lessons/:id/progress", progressHandler.GetLessonProgress)
+	api.GET("/courses/:id/resume", progressHandler.GetResumeLesson)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Server.Port)))
 }

@@ -1,7 +1,7 @@
 export interface ContentBlock {
-  type: "Text" | "Image" | "CodeSnippet" | "Quiz";
+  type: "Text" | "Image" | "CodeSnippet" | "Quiz" | "ReactFlowDiagram";
   order: number;
-  config: TextConfig | ImageConfig | CodeSnippetConfig | QuizConfig;
+  config: TextConfig | ImageConfig | CodeSnippetConfig | QuizConfig | ReactFlowDiagramConfig;
 }
 
 export interface TextConfig {
@@ -40,4 +40,30 @@ export interface QuizResult {
   totalQuestions: number;
   correctAnswers: number;
   passed: boolean;
+}
+
+export interface ReactFlowDiagramConfig {
+  nodeTypes: Record<string, number>;
+  edges: DiagramEdge[];
+}
+
+export interface DiagramEdge {
+  from: string;
+  to: string;
+}
+
+export interface DiagramNode {
+  id: string;
+  type: string;
+}
+
+export interface UserDiagram {
+  nodes: DiagramNode[];
+  edges: DiagramEdge[];
+}
+
+export interface DiagramValidationResult {
+  valid: boolean;
+  score: number;
+  errors: string[];
 }
